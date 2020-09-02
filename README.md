@@ -22,7 +22,7 @@
   <a href="https://hub.docker.com/r/l34r00t/mainrecon"><img alt="Docker Image Size (latest by date)" src="https://img.shields.io/docker/image-size/l34r00t/mainrecon"></a>
   <a href="https://hub.docker.com/r/l34r00t/mainrecon"><img alt="Docker Image Version (latest by date)" src="https://img.shields.io/docker/v/l34r00t/mainrecon"></a>
   <a href="https://hub.docker.com/r/l34r00t/mainrecon"><img alt="Docker Stars" src="https://img.shields.io/docker/stars/l34r00t/mainrecon"></a>
-  <a href="https://github.com/l34r00t//blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/l34r00t/mainRecon"></a>
+  <a href="https://github.com/l34r00t/mainRecon/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/l34r00t/mainRecon"></a>
 
   mainRecon for bugbounty hunter is an image with a bash script with some of the tools used at recon workflow.
 </p>
