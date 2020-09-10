@@ -67,10 +67,13 @@ RUN \
     # Install subfinder
     go get github.com/projectdiscovery/subfinder/cmd/subfinder && \
     # subfinder --set-config VirustotalAPIKey=<API-KEY-HERE> && \
-    # subfinder --set-config PassivetotalUsername=<API-KEY-HERE>,PassivetotalKey=<API-KEY-HERE> && \
+    # subfinder --set-config PassivetotalUsername=<API-KEY-HERE> && \
+    # subfinder --set-config PassivetotalKey=<API-KEY-HERE> && \
     # subfinder --set-config SecurityTrailsKey=<API-KEY-HERE> && \
-    # subfinder --set-config RiddlerEmail=<API-KEY-HERE>,RiddlerPassword=<API-KEY-HERE> && \
-    # subfinder --set-config CensysUsername=<API-KEY-HERE>,CensysSecret=<API-KEY-HERE> && \
+    # subfinder --set-config RiddlerEmail=<API-KEY-HERE> && \
+    # subfinder --set-config RiddlerPassword=<API-KEY-HERE> && \
+    # subfinder --set-config CensysUsername=<API-KEY-HERE> && \
+    # subfinder --set-config ensysSecret=<API-KEY-HERE> && \
     # subfinder --set-config ShodanAPIKey=<API-KEY-HERE> && \
     # Install ParamSpider
     git clone https://github.com/devanshbatham/ParamSpider && \
