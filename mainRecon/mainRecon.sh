@@ -19,7 +19,7 @@ By_l34r00t | {v1.0}
 # Usage
 Usage() {
     echo -e "$green
-Usage: ./mainData.sh [-p/--program] hackerone [-f/--file] targets.txt
+Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt
 	"$end
     exit 1
 }
