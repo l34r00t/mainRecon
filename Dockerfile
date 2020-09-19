@@ -66,8 +66,6 @@ RUN \
     go get github.com/tomnomnom/waybackurls && \
     # Install subfinder
     go get github.com/projectdiscovery/subfinder/cmd/subfinder && \
-    # Subfinder configuration
-    COPY configs/subfinder/config.yaml /root/.config/subfinder/config.yaml && \
     # Install ParamSpider
     git clone https://github.com/devanshbatham/ParamSpider && \
     pip3 install -r ParamSpider/requirements.txt && \
@@ -80,6 +78,8 @@ RUN \
     # Install subjs
     go get -u github.com/lc/subjs
 
+# Subfinder configuration
+COPY configs/subfinder/config.yaml /root/.config/subfinder/config.yaml
 # Findomain configuration
 ENV findomain_fb_token="ENTER_TOKEN_HERE"
 ENV findomain_virustotal_token="ENTER_TOKEN_HERE"
