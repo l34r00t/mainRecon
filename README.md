@@ -53,7 +53,7 @@
 
 ## About mainRecon
 
-mainRecon is an automated reconnaissance docked image for bugbounty hunter write in bash script. This image has the basic tools used in the recognition workflow. The purpose it`s to simplify the recon flow in a simple way.
+mainRecon is an automated reconnaissance docker image for bug bounty hunter write in bash script. This image has the basic tools used in the recon workflow. The purpose is to simplify the recon workflow in a simple way.
 
 You can run the docker image in your PC o [VPS](https://www.digitalocean.com/?refcode=b5a9fc36fd95&utm_campaign=Referral_Invite&utm_medium=Referral_Program).
 
@@ -61,13 +61,13 @@ You can run the docker image in your PC o [VPS](https://www.digitalocean.com/?re
 
 - Subdomain Enumeration
 - Checks alive subdomain
-- Search URLs at Wayback Machine
+- Finds URLs at Wayback Machine
 - Screenshots of the subdomains
 - Headers responses files
 - Finds js files
-- Finds tokes in js files
-- Finds endpoints in js files
-- Finds parameters from subdomains
+- Search tokes in js files
+- Search endpoints in js files
+- Finds parameters
 - Finds directories
 - Telegram notifications
 
@@ -108,14 +108,23 @@ You can use the docker image by the next two options:
 
 ### Option 1 - Use the github repository
 
-First, must clone the mainRecon repository.
+If you want to build the container yourself manually, git clone the repo, then build and run the following commands
 
     git clone --depth 1 https://github.com/l34r00t/mainRecon.git
     cd mainRecon
+
+If you want Telegram Alert, you must modify the telegram bot_token and telegram chat_ID in mainRecon.sh
+
+Also, you can configure access token for run findomain and subfinder. You must configure the Dockerfile ("ENTER_TOKEN_HERE") and config.yml (ENTER_APIKEY_HERE).
+
+Build your docker container
+
     docker build -t mainrecon .
+
+After building the container using either way, run the following:
+
     docker run --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt 
 
-Then, modify telegram bot_token and telegram chat_ID in mainRecon.sh
 
 ### Option 2 - Use the image from docker hub
 
@@ -133,11 +142,10 @@ Use image from docker hub: [l34r00t/mainrecon](https://hub.docker.com/u/l34r00t/
 
 There are differents use cases for use the image and you should know how to run the container properly.
 
-1. Share information from your local directory to container directory and save information on your local directory. You should save information under /mainData directory.
+  Share information from your local directory to container directory and save information on your local directory. You should save information under /mainData directory.
 
         docker run --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt 
 
-2. I you use the telegram bot youmust modify telegram bot_token and telegram chat_ID in mainRecon.sh
 
 ### targets.txt
 
@@ -156,9 +164,14 @@ Thank you [Edu4rdSHL](https://github.com/Edu4rdSHL/) for you telegram webhook wr
 ## mainRecon scan results
 
 ### h1-Recon
-[![asciicast](https://asciinema.org/a/356881.svg)](https://asciinema.org/a/356881)
 
 In the following repository you will obtain all [h1 recon results](https://github.com/l34r00t/mainRecon-h1-enum)
+
+<img
+      alt="mainRecon for bugbounty hunter"
+      src="img/h1-results.png"
+      width="600"
+/>
 
 ### mainRecon Alert
 
@@ -194,7 +207,7 @@ If you like my content, please consider inviting me to a coffee. Thank you for y
 
 mainRecon has been possible thank you to the following projects.
 
-- [Edu4rdSHL](https://github.com/Edu4rdSHL/)                                               
+- [Edu4rdSHL](https://github.com/Edu4rdSHL)                                             
 - [tomnomnom](https://github.com/tomnomnom/)         
 - [OWASP](https://github.com/OWASP/)               
 - [michenriksen](https://github.com/michenriksen/)
