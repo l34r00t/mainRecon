@@ -66,15 +66,8 @@ RUN \
     go get github.com/tomnomnom/waybackurls && \
     # Install subfinder
     go get github.com/projectdiscovery/subfinder/cmd/subfinder && \
-    # subfinder --set-config VirustotalAPIKey=<API-KEY-HERE> && \
-    # subfinder --set-config PassivetotalUsername=<API-KEY-HERE> && \
-    # subfinder --set-config PassivetotalKey=<API-KEY-HERE> && \
-    # subfinder --set-config SecurityTrailsKey=<API-KEY-HERE> && \
-    # subfinder --set-config RiddlerEmail=<API-KEY-HERE> && \
-    # subfinder --set-config RiddlerPassword=<API-KEY-HERE> && \
-    # subfinder --set-config CensysUsername=<API-KEY-HERE> && \
-    # subfinder --set-config ensysSecret=<API-KEY-HERE> && \
-    # subfinder --set-config ShodanAPIKey=<API-KEY-HERE> && \
+    # Subfinder configuration
+    COPY configs/subfinder/config.yaml /root/.config/subfinder/config.yaml && \
     # Install ParamSpider
     git clone https://github.com/devanshbatham/ParamSpider && \
     pip3 install -r ParamSpider/requirements.txt && \
@@ -85,7 +78,13 @@ RUN \
     # Install unfurl
     go get -u github.com/tomnomnom/unfurl && \
     # Install subjs
-    go get -u github.com/lc/subjs  
+    go get -u github.com/lc/subjs
+
+# Findomain configuration
+ENV findomain_fb_token="ENTER_TOKEN_HERE"
+ENV findomain_virustotal_token="ENTER_TOKEN_HERE"
+ENV findomain_securitytrails_token="ENTER_TOKEN_HERE"
+ENV findomain_spyse_token="ENTER_TOKEN_HERE"
 
 WORKDIR /tools/LinkFinder/
 RUN \
