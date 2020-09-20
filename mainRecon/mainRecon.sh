@@ -141,19 +141,19 @@ get_paths() {
 
     for host in $(cat alive.txt); do
         dirsearch_file=$(echo $host | sed -E 's/[\.|\/|:]+/_/g').txt
-        python3 /tools/dirsearch/dirsearch.py -E -t 50 --plain-text dirsearch/$dirsearch_file -u $host | grep Target && tput sgr0
+        python3 /tools/dirsearch/dirsearch.py -E -t 50 --plain-text dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt | grep Target && tput sgr0
     done
 
-    grep -R '200' dirsearch/ > dirsearch/status200.txt 
-    grep -R '301' dirsearch/ > dirsearch/status301.txt
-    grep -R '302' dirsearch/ > dirsearch/status301.txt
-    grep -R '400' dirsearch/ > dirsearch/status400.txt
-    grep -R '401' dirsearch/ > dirsearch/status401.txt
-    grep -R '403' dirsearch/ > dirsearch/status403.txt
-    grep -R '404' dirsearch/ > dirsearch/status404.txt
-    grep -R '405' dirsearch/ > dirsearch/status405.txt
-    grep -R '500' dirsearch/ > dirsearch/status500.txt
-    grep -R '503' dirsearch/ > dirsearch/status503.txt
+    grep -R '200' dirsearch/ > dirsearch/status200.txt 2>/dev/null
+    grep -R '301' dirsearch/ > dirsearch/status301.txt 2>/dev/null
+    grep -R '302' dirsearch/ > dirsearch/status301.txt 2>/dev/null
+    grep -R '400' dirsearch/ > dirsearch/status400.txt 2>/dev/null
+    grep -R '401' dirsearch/ > dirsearch/status401.txt 2>/dev/null
+    grep -R '403' dirsearch/ > dirsearch/status403.txt 2>/dev/null
+    grep -R '404' dirsearch/ > dirsearch/status404.txt 2>/dev/null
+    grep -R '405' dirsearch/ > dirsearch/status405.txt 2>/dev/null
+    grep -R '500' dirsearch/ > dirsearch/status500.txt 2>/dev/null
+    grep -R '503' dirsearch/ > dirsearch/status503.txt 2>/dev/null
 
     find dirsearch/ -size 0 -delete
 }
