@@ -78,8 +78,6 @@ RUN \
     # Install subjs
     go get -u github.com/lc/subjs
 
-# Subfinder configuration
-COPY configs/subfinder/config.yaml /root/.config/subfinder/config.yaml
 # Findomain configuration
 ENV findomain_fb_token="ENTER_TOKEN_HERE"
 ENV findomain_virustotal_token="ENTER_TOKEN_HERE"

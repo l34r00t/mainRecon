@@ -115,7 +115,7 @@ If you want to build the container yourself manually, git clone the repo, then b
 
 If you want Telegram Alert, you must modify the telegram bot_token and telegram chat_ID in mainRecon.sh
 
-Also, you can configure access token for run findomain and subfinder. You must configure the Dockerfile ("ENTER_TOKEN_HERE") and config.yml (ENTER_APIKEY_HERE).
+Also, you can configure access token for run findomain. You must configure the Dockerfile ("ENTER_TOKEN_HERE").
 
 Build your docker container
 
