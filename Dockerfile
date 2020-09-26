@@ -65,7 +65,7 @@ RUN \
     # Install waybackurls
     go get github.com/tomnomnom/waybackurls && \
     # Install subfinder
-    go get github.com/projectdiscovery/subfinder/cmd/subfinder && \
+    go get github.com/projectdiscovery/subfinder/v2/cmd/subfinder && \
     # Install ParamSpider
     git clone https://github.com/devanshbatham/ParamSpider && \
     pip3 install -r ParamSpider/requirements.txt && \
