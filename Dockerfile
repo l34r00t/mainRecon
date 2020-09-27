@@ -85,10 +85,10 @@ RUN \
     # Install seclist
     git clone https://github.com/danielmiessler/SecLists.git && \
     # Install nuclei
-    GO111MODULE=on go get -u -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei
+    GO111MODULE=on go get -u -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei && \
     # Update nuclei-templates
+    # nuclei -update-templates
 
-    nuclei -update-templates
 # Findomain configuration
 ENV findomain_fb_token="ENTER_TOKEN_HERE"
 ENV findomain_virustotal_token="ENTER_TOKEN_HERE"
