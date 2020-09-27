@@ -44,7 +44,7 @@ get_subdomains() {
     findomain -q -f /mainData/$file -r -u findomain_domains.txt
     cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
     amass enum -df /mainData/$file -passive -o ammas_passive_domains.txt
-    subfinder -dL /mainData/$file -o subfinder_domains.txt
+    subfinder -config /mainData/config.yaml -dL /mainData/$file -o subfinder_domains.txt
     chaos -d /mainData/$file -key $chaos_key -o chaos_domains.txt
     sort -u *_domains.txt -o subdomains.txt
     cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
