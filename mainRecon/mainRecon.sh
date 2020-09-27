@@ -30,6 +30,12 @@ chat_ID=$chat_ID
 url="https://api.telegram.org/bot$bot_token/sendMessage"
 
 # Function
+
+get _resolvers() {
+    echo -e $red"[+]"$end $bold"Get Subdomains"$end
+    wget https://raw.githubusercontent.com/janmasarik/resolvers/master/resolvers.txt -O resolvers.txt
+}
+
 get_subdomains() {
     echo -e $red"[+]"$end $bold"Get Subdomains"$end
     folder=$program-$(date '-I')
@@ -39,16 +45,19 @@ get_subdomains() {
     cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
     amass enum -df /mainData/$file -passive -o ammas_passive_domains.txt
     subfinder -dL /mainData/$file -o subfinder_domains.txt
+    chaos -d /mainData/$file -key $chaos_key -o chaos_domains.txt
     sort -u *_domains.txt -o subdomains.txt
     cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
-    cat *.txt | sort -u >domains.txt
-    find . -type f -not -name 'domains.txt' -delete
+    cat *.txt | sort -u >subdomains.txt
+    find . -type f -not -name 'subdomains.txt' -delete
 }
 
 get_alive() {
-    echo -e $red"[+]"$end $bold"Get Alive"$end
+    echo -e $red"[+]"$end $bold"Resolving Alive Subdomains"$end
+    cat subdomains.txt | sort -u | shuffledns -silent -d $file -r resolvers.txt > alive_subdomains
 
-    cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
+    echo -e $red"[+]"$end $bold"Get Alive"$end
+    cat alive_domains.txt | httprobe -c 50 -t 3000 >alive.txt
     cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
 
     result="cat alive.txt"
@@ -171,6 +180,7 @@ program=False
 file=False
 
 list=(
+    get_resolvers
     get_subdomains
     get_alive
     get_waybackurl
@@ -206,6 +216,7 @@ done
     Usage
 }
 (
+    get_resolvers
     get_subdomains
     get_alive
     get_waybackurl

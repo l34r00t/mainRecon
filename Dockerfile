@@ -38,16 +38,17 @@ RUN mkdir tools \
 WORKDIR /tools/
 RUN \
     # Install findomain
-    wget --quiet https://github.com/Edu4rdSHL/findomain/releases/download/1.5.0/findomain-linux -O /tools/findomain/findomain && \
+    wget --quiet https://github.com/Edu4rdSHL/findomain/releases/latest/download/findomain-linux -O /tools/findomain/findomain && \
     chmod +x /tools/findomain/findomain && \
     ln -s /tools/findomain/findomain /usr/bin/findomain && \
     # Install assetfinder
     go get -u github.com/tomnomnom/assetfinder && \
     # Install amass
-    wget --quiet https://github.com/OWASP/Amass/releases/download/v3.5.5/amass_v3.5.5_linux_amd64.zip -O /tools/amass/amass.zip && \
-    unzip /tools/amass/amass.zip -d /tools/amass/ && \
-    rm /tools/amass/amass.zip && \
-    ln -s /tools/amass/amass_v3.5.5_linux_amd64/amass /usr/bin/amass && \
+    #wget --quiet https://github.com/OWASP/Amass/releases/download/v3.5.5/amass_v3.5.5_linux_amd64.zip -O /tools/amass/amass.zip && \
+    #unzip /tools/amass/amass.zip -d /tools/amass/ && \
+    #rm /tools/amass/amass.zip && \
+    #ln -s /tools/amass/amass_v3.5.5_linux_amd64/amass /usr/bin/amass && \
+    GO111MODULE=on go get -v github.com/OWASP/Amass/v3/... && \
     # Install httprobe
     go get -u github.com/tomnomnom/httprobe && \
     # Install waybackurls
@@ -76,13 +77,24 @@ RUN \
     # Install unfurl
     go get -u github.com/tomnomnom/unfurl && \
     # Install subjs
-    go get -u github.com/lc/subjs
+    go get -u github.com/lc/subjs && \
+    # Install chaos
+    GO111MODULE=on go get -u github.com/projectdiscovery/chaos-client/cmd/chaos && \
+    # Install shuffledns
+    GO111MODULE=on go get -u -v github.com/projectdiscovery/shuffledns/cmd/shuffledns && \
+    # Install seclist
+    git clone https://github.com/danielmiessler/SecLists.git && \
+    # Install nuclei
+    GO111MODULE=on go get -u -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei
+    # Update nuclei-templates
 
+    nuclei -update-templates
 # Findomain configuration
 ENV findomain_fb_token="ENTER_TOKEN_HERE"
 ENV findomain_virustotal_token="ENTER_TOKEN_HERE"
 ENV findomain_securitytrails_token="ENTER_TOKEN_HERE"
 ENV findomain_spyse_token="ENTER_TOKEN_HERE"
+ENV chaos_key="ENTER_KEY_HERE"
 
 WORKDIR /tools/LinkFinder/
 RUN \
