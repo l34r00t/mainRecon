@@ -31,7 +31,7 @@ url="https://api.telegram.org/bot$bot_token/sendMessage"
 
 # Function
 
-get _resolvers() {
+get_resolvers() {
     echo -e $red"[+]"$end $bold"Get Subdomains"$end
     wget https://raw.githubusercontent.com/janmasarik/resolvers/master/resolvers.txt -O resolvers.txt
 }
