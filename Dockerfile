@@ -85,7 +85,7 @@ RUN \
     # Install seclist
     git clone https://github.com/danielmiessler/SecLists.git && \
     # Install nuclei
-    GO111MODULE=on go get -u -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei && \
+    GO111MODULE=on go get -u -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei
     # Update nuclei-templates
     # nuclei -update-templates
 
@@ -95,6 +95,8 @@ ENV findomain_virustotal_token="ENTER_TOKEN_HERE"
 ENV findomain_securitytrails_token="ENTER_TOKEN_HERE"
 ENV findomain_spyse_token="ENTER_TOKEN_HERE"
 ENV chaos_key="ENTER_KEY_HERE"
+ENV token="ENTER_KEY_HERE"
+ENV chat_ID="ENTER_KEY_HERE"
 
 WORKDIR /tools/LinkFinder/
 RUN \

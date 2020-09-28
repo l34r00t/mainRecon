@@ -20,7 +20,7 @@ By_l34r00t | {v1.0}
 Usage() {
     echo -e "$green
 Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt
-	"$end
+    "$end
     exit 1
 }
 
@@ -31,21 +31,35 @@ url="https://api.telegram.org/bot$bot_token/sendMessage"
 
 # Function
 
+set_basic() {
+    echo -e $red"[+]"$end $bold"Create folder of program"$end
+    folder=$program-$(date '-I')
+    mkdir $folder && cd $folder
+}
+
 get_resolvers() {
-    echo -e $red"[+]"$end $bold"Get Subdomains"$end
+    echo -e $red"[+]"$end $bold"Get resolvers"$end
     wget https://raw.githubusercontent.com/janmasarik/resolvers/master/resolvers.txt -O resolvers.txt
 }
 
 get_subdomains() {
     echo -e $red"[+]"$end $bold"Get Subdomains"$end
-    folder=$program-$(date '-I')
-    mkdir $folder && cd $folder
 
+    echo -e $red"[+]"$end $bold"Run Findomain"$end
     findomain -q -f /mainData/$file -r -u findomain_domains.txt
+    
+    echo -e $red"[+]"$end $bold"Run Assetfinder"$end
     cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
+
+    echo -e $red"[+]"$end $bold"Run Amass"$end
     amass enum -df /mainData/$file -passive -o ammas_passive_domains.txt
+    
+    echo -e $red"[+]"$end $bold"Run Subfinder"$end    
     subfinder -config /mainData/config.yaml -dL /mainData/$file -o subfinder_domains.txt
+
+    echo -e $red"[+]"$end $bold"Run Chaos"$end    
     chaos -d /mainData/$file -key $chaos_key -o chaos_domains.txt
+    
     sort -u *_domains.txt -o subdomains.txt
     cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
     cat *.txt | sort -u >subdomains.txt
@@ -54,15 +68,15 @@ get_subdomains() {
 
 get_alive() {
     echo -e $red"[+]"$end $bold"Resolving Alive Subdomains"$end
-    cat subdomains.txt | sort -u | shuffledns -silent -d $file -r resolvers.txt > alive_subdomains
+    cat subdomains.txt | sort -u | shuffledns -silent -r resolvers.txt | httprobe > alive_subdomains.txt
 
-    echo -e $red"[+]"$end $bold"Get Alive"$end
-    cat alive_domains.txt | httprobe -c 50 -t 3000 >alive.txt
-    cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
+    #echo -e $red"[+]"$end $bold"Get Alive"$end
+    #cat alive_subdomains.txt | httprobe -c 50 -t 3000 >alive.txt
+    cat alive_subdomains | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
 
-    result="cat alive.txt"
+    result="cat alive_subdomains.txt"
     message="[ + ] mainRecon Alert:
-    [ --> ] alive.txt for: $program 
+    [ --> ] alive_subdomains.txt for: $program 
     $($result)"
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 }
@@ -72,7 +86,7 @@ get_waybackurl() {
 
     mkdir waybackdata
 
-    cat alive.txt | waybackurls >waybackdata/waybackurls.txt
+    cat alive_subdomains.txt | waybackurls >waybackdata/waybackurls.txt
     cat waybackdata/waybackurls.txt | sort -u | unfurl --unique keys >waybackdata/paramlist.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.js(\?|$)" | sort -u >waybackdata/jsurls.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.php(\?|$)" | sort -u >waybackdata/phpurls.txt
@@ -99,7 +113,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
+    cat alive_subdomains.txt | aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
 }
 
 get_js() {
@@ -107,7 +121,7 @@ get_js() {
 
     mkdir jslinks
 
-    cat alive.txt | subjs >>jslinks/all_jslinks.txt
+    cat alive_subdomains.txt | subjs >>jslinks/all_jslinks.txt
 }
 
 get_tokens() {
@@ -115,7 +129,7 @@ get_tokens() {
 
     mkdir tokens
 
-    cat alive.txt waybackdata/jsurls.txt jslinks/all_jslinks.txt >tokens/all_js_urls.txt
+    cat alive_subdomains.txt waybackdata/jsurls.txt jslinks/all_jslinks.txt >tokens/all_js_urls.txt
     sort -u tokens/all_js_urls.txt -o tokens/all_js_urls.txt
     cat tokens/all_js_urls.txt | python3 /tools/new-zile/zile.py --request >>tokens/all_tokens.txt
     sort -u tokens/all_tokens.txt -o tokens/all_tokens.txt
@@ -148,7 +162,7 @@ get_paths() {
     current_path=$(pwd)
     mkdir dirsearch
 
-    for host in $(cat alive.txt); do
+    for host in $(cat alive_subdomains.txt); do
         dirsearch_file=$(echo $host | sed -E 's/[\.|\/|:]+/_/g').txt
         python3 /tools/dirsearch/dirsearch.py -E -t 50 --plain-text dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt | grep Target && tput sgr0
     done
@@ -216,6 +230,7 @@ done
     Usage
 }
 (
+    set_basic
     get_resolvers
     get_subdomains
     get_alive
