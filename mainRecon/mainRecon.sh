@@ -62,21 +62,21 @@ get_subdomains() {
     
     sort -u *_domains.txt -o subdomains.txt
     cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
-    cat *.txt | sort -u >subdomains.txt
-    find . -type f -not -name 'subdomains.txt' -delete
+    cat *.txt | sort -u >domains.txt
+    find . -type f -not -name 'domains.txt' -delete
 }
 
 get_alive() {
-    echo -e $red"[+]"$end $bold"Resolving Alive Subdomains"$end
-    cat subdomains.txt | sort -u | shuffledns -silent -r resolvers.txt | httprobe > alive_subdomains.txt
+    #echo -e $red"[+]"$end $bold"Resolving Alive Subdomains"$end
+    # cat subdomains.txt | sort -u | shuffledns -silent -r resolvers.txt | httprobe > alive_subdomains.txt
 
-    #echo -e $red"[+]"$end $bold"Get Alive"$end
-    #cat alive_subdomains.txt | httprobe -c 50 -t 3000 >alive.txt
-    cat alive_subdomains | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
+    echo -e $red"[+]"$end $bold"Get Alive"$end
+    cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
+    cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
 
-    result="cat alive_subdomains.txt"
+    result="cat alive.txt"
     message="[ + ] mainRecon Alert:
-    [ --> ] alive_subdomains.txt for: $program 
+    [ --> ] alive.txt for: $program 
     $($result)"
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 }
@@ -86,7 +86,7 @@ get_waybackurl() {
 
     mkdir waybackdata
 
-    cat alive_subdomains.txt | waybackurls >waybackdata/waybackurls.txt
+    cat alive.txt | waybackurls >waybackdata/waybackurls.txt
     cat waybackdata/waybackurls.txt | sort -u | unfurl --unique keys >waybackdata/paramlist.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.js(\?|$)" | sort -u >waybackdata/jsurls.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.php(\?|$)" | sort -u >waybackdata/phpurls.txt
@@ -113,7 +113,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive_subdomains.txt | aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
+    cat alive.txt | aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
 }
 
 get_js() {
@@ -121,7 +121,7 @@ get_js() {
 
     mkdir jslinks
 
-    cat alive_subdomains.txt | subjs >>jslinks/all_jslinks.txt
+    cat alive.txt | subjs >>jslinks/all_jslinks.txt
 }
 
 get_tokens() {
@@ -129,7 +129,7 @@ get_tokens() {
 
     mkdir tokens
 
-    cat alive_subdomains.txt waybackdata/jsurls.txt jslinks/all_jslinks.txt >tokens/all_js_urls.txt
+    cat alive.txt waybackdata/jsurls.txt jslinks/all_jslinks.txt >tokens/all_js_urls.txt
     sort -u tokens/all_js_urls.txt -o tokens/all_js_urls.txt
     cat tokens/all_js_urls.txt | python3 /tools/new-zile/zile.py --request >>tokens/all_tokens.txt
     sort -u tokens/all_tokens.txt -o tokens/all_tokens.txt
