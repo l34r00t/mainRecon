@@ -158,6 +158,13 @@ get_paths() {
     find dirsearch/ -size 0 -delete
 }
 
+get_zip() {
+    echo -e $red"[+]"$end $bold"Get ZIP"$end
+
+    cd ..
+    zip -r $folder.zip $folder
+}
+
 get_message() {
     echo -e $red"[+]"$end $bold"Get Message"$end
 
@@ -180,6 +187,7 @@ list=(
     get_endpoints
     get_paramspider
     get_paths
+    get_zip
     get_message
 )
 
@@ -215,5 +223,6 @@ done
     get_endpoints
     get_paramspider
     get_paths
+    get_zip
     get_message
 )
