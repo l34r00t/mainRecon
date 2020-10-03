@@ -16,6 +16,7 @@ RUN \
     wget \
     python \
     python3 \
+    zip \
     unzip
 
 COPY mainRecon/mainRecon.sh mainRecon/ 
