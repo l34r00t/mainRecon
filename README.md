@@ -119,7 +119,13 @@ Also, you can configure access token for run findomain. You must configure the D
 
 Build your docker container
 
-    docker build -t mainrecon .
+**linux/amd64:**
+
+```docker build -t mainrecon-master .```
+
+**Others (including Apple silicon):**
+
+```docker build --platform=linux/amd64 -t mainrecon .```
 
 After building the container using either way, run the following:
 
