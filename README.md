@@ -119,12 +119,23 @@ Also, you can configure access token for run findomain. You must configure the D
 
 Build your docker container
 
-    docker build -t mainrecon .
+**linux/amd64:**
+
+```docker build -t mainrecon-master .```
+
+**Others (including Apple silicon):**
+
+```docker build --platform=linux/amd64 -t mainrecon .```
 
 After building the container using either way, run the following:
 
-    docker run --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt 
+**linux/amd64:**
 
+```docker run --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+
+**Others (including Apple silicon):**
+
+```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
 
 ### Option 2 - Use the image from docker hub
 
@@ -144,7 +155,13 @@ There are differents use cases for use the image and you should know how to run 
 
   Share information from your local directory to container directory and save information on your local directory. You should save information under /mainData directory.
 
-        docker run --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt 
+**linux/amd64:**
+
+```docker run --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+
+**Others (including Apple silicon):**
+
+```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
 
 
 ### targets.txt
