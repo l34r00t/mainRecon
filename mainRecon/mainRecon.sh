@@ -25,8 +25,8 @@ Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt [-m/--mod
 }
 
 # Bot Telegram
-bot_token=''
-chat_ID=''
+bot_token='5573433981:AAEcyaP2rXLYmFbxYDBjFsWcsTYYTpK3ujQ'
+chat_ID='1149609099'
 url="https://api.telegram.org/bot$bot_token/sendMessage"
 
 # Functions
@@ -140,7 +140,7 @@ get_alive() {
 
     result="cat alive.txt"
     message="[ + ] mainRecon Alert:
-    [ --> ] alive.txt for: $program 
+    [ --> ] alive.txt for: $programa
     $($result)"
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 
@@ -268,7 +268,7 @@ get_message() {
     echo -e $red"[+]"$end $bold"Sending Message.."$end
 
     message="[ + ] mainRecon Alert:
-    [ --> ] Recon Completed for $program #happyhacking"
+    [ --> ] Recon Completed for $programa #happyhacking"
 
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 
