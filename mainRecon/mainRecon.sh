@@ -14,12 +14,15 @@ echo -e $yellow"
 
 By_l34r00t | {v1.0}
 @leapintos | leandro@leandropintos.com
+-----------|--------------------------
+@Sheryx00  | {v1.1}
+
 "$end
 
 # Usage
 Usage() {
     echo -e "$green
-Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt
+Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt [-e/--exclude] exclude.txt [OPTIONAL] -s [OPTIONAL]
 	"$end
     exit 1
 }
@@ -31,18 +34,30 @@ url="https://api.telegram.org/bot$bot_token/sendMessage"
 
 # Function
 get_subdomains() {
-    echo -e $red"[+]"$end $bold"Get Subdomains"$end
+
     folder=$program-$(date '-I')
     mkdir $folder && cd $folder
 
-    findomain -q -f /mainData/$file -r -u findomain_domains.txt
-    cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
-    amass enum -df /mainData/$file -passive -o ammas_passive_domains.txt
-    subfinder -dL /mainData/$file -o subfinder_domains.txt
-    sort -u *_domains.txt -o subdomains.txt
-    cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
-    cat *.txt | sort -u >domains.txt
-    find . -type f -not -name 'domains.txt' -delete
+    if [ ! -z $strict ];then
+        echo -e $red"[+]"$end $bold"Strict Mode"$end
+        cp /mainData/$file domains.txt
+    else
+        echo -e $red"[+]"$end $bold"Get Subdomains"$end
+        findomain -q -f /mainData/$file -r -u findomain_domains.txt
+        amass enum -df /mainData/$file -active -o ammas_active_domains.txt
+        cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
+        subfinder -dL /mainData/$file -o subfinder_domains.txt
+        sort -u *_domains.txt -o subdomains.txt
+        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
+        cat *.txt | sort -u > all_domains.txt
+        if [ ! -z $exclude ];then
+            echo -e $red"[+]"$end $bold"Excluding blacklisted domains"$end
+            grep -v -f /mainData/$exclude all_domains.txt | tee domains.txt
+        else
+            mv all_domains.txt domains.txt
+        fi
+        find . -type f -name '_domains.txt' -delete
+    fi
 }
 
 get_alive() {
@@ -50,12 +65,6 @@ get_alive() {
 
     cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
     cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
-
-    result="cat alive.txt"
-    message="[ + ] mainRecon Alert:
-    [ --> ] alive.txt for: $program 
-    $($result)"
-    curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 }
 
 get_waybackurl() {
@@ -90,7 +99,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
+    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
 }
 
 get_js() {
@@ -124,14 +133,21 @@ get_endpoints() {
 }
 
 get_paramspider() {
-    echo -e $red"[+]"$end $bold"Get ParamSpider"$end
+    mkdir params
+    mkdir params/gospider
 
-    mkdir paramspider
-
-    for targets in $(cat /mainData/targets.txt); do
-        targets_file=$(echo $targets | sed -E 's/[\.|\/|:]+/_/g')
-        python3 /tools/ParamSpider/paramspider.py --domain $targets --exclude woff,css,js,png,svg,php,jpg --output paramspider/"$targets_file"_paramspider.txt
+    echo -e $red"[+]"$end $bold"Running Paramspider"$end
+    for targets in $(cat alive.txt); do
+        # Remove the protocol and sanitize the URL for a valid filename
+        targets_file=$(echo $targets | sed -E 's|https?://||; s|[/:]+|_|g')
+        
+        # Run ParamSpider with the sanitized domain
+        domain=$(echo $targets | sed -E 's|https?://||')
+        paramspider --domain "$domain"
     done
+    mv results params/paramspider
+    echo -e $red"[+]"$end $bold"Running Gospider"$end
+    gospider -S alive.txt -o params/gospider
 }
 
 get_paths() {
@@ -141,7 +157,7 @@ get_paths() {
 
     for host in $(cat alive.txt); do
         dirsearch_file=$(echo $host | sed -E 's/[\.|\/|:]+/_/g').txt
-        python3 /tools/dirsearch/dirsearch.py -E -t 50 --plain-text dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt | grep Target && tput sgr0
+        python3 /tools/dirsearch/dirsearch.py -t 50 -O plain dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt 2>/dev/null | grep Target && echo -e "\033[0m"
     done
 
     grep -R '200' dirsearch/ > dirsearch/status200.txt 2>/dev/null
@@ -201,6 +217,14 @@ while [ -n "$1" ]; do
         file=$2
         shift
         ;;
+    -e | --exclude)
+    	exclude=$2
+	    shift
+    	;;
+    -s | -strict-scope)
+    	strict=true
+	    shift
+    	;;
     *)
         echo -e $red"[-]"$end "Unknown Option: $1"
         Usage
@@ -214,15 +238,15 @@ done
     Usage
 }
 (
-    get_subdomains
-    get_alive
-    get_waybackurl
-    get_aquatone
-    get_js
-    get_tokens
-    get_endpoints
-    get_paramspider
-    get_paths
-    get_zip
-    get_message
+   get_subdomains
+   get_alive
+   get_waybackurl
+   get_aquatone
+   get_js
+   get_tokens
+   get_endpoints
+   get_paramspider
+   get_paths
+   get_zip
+   get_message
 )
