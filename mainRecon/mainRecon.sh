@@ -132,7 +132,7 @@ get_endpoints() {
     done
 }
 
-get_paramspider() {
+get_params() {
     mkdir params
     mkdir params/gospider
 
@@ -143,7 +143,7 @@ get_paramspider() {
         
         # Run ParamSpider with the sanitized domain
         domain=$(echo $targets | sed -E 's|https?://||')
-        paramspider --domain "$domain"
+        paramspider --domain "$domain" >/dev/null 2>&1
     done
     mv results params/paramspider
     echo -e $red"[+]"$end $bold"Running Gospider"$end
@@ -157,7 +157,7 @@ get_paths() {
 
     for host in $(cat alive.txt); do
         dirsearch_file=$(echo $host | sed -E 's/[\.|\/|:]+/_/g').txt
-        python3 /tools/dirsearch/dirsearch.py -t 50 -O plain dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt 2>/dev/null | grep Target && echo -e "\033[0m"
+        python3 /tools/dirsearch/dirsearch.py -t 50 -O plain -o dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt 2>/dev/null | grep Target && echo -e "\033[0m"
     done
 
     grep -R '200' dirsearch/ > dirsearch/status200.txt 2>/dev/null
@@ -201,7 +201,7 @@ list=(
     get_js
     get_tokens
     get_endpoints
-    get_paramspider
+    get_params
     get_paths
     get_zip
     get_message
@@ -245,7 +245,7 @@ done
    get_js
    get_tokens
    get_endpoints
-   get_paramspider
+   get_params
    get_paths
    get_zip
    get_message
