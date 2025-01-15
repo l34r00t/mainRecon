@@ -12,10 +12,10 @@ echo -e $yellow"
  ._ _   _. o ._  |_)  _   _  _  ._  
  | | | (_| | | | | \ (/_ (_ (_) | |
 
-By_l34r00t | {v1.0}
 @leapintos | leandro@leandropintos.com
 -----------|--------------------------
-@Sheryx00  | {v1.1}
+By_l34r00t | {v1.0}
+Sheryx00   | {v1.1}
 
 "$end
 
@@ -43,12 +43,15 @@ get_subdomains() {
         cp /mainData/$file domains.txt
     else
         echo -e $red"[+]"$end $bold"Get Subdomains"$end
+        echo -e $green"[+]"$end $bold"Running findomain"$end
         findomain -q -f /mainData/$file -r -u findomain_domains.txt
+        echo -e $green"[+]"$end $bold"Running amass"$end
         amass enum -df /mainData/$file -active -o ammas_active_domains.txt
         cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
+        echo -e $green"[+]"$end $bold"Running subfinder"$end
         subfinder -dL /mainData/$file -o subfinder_domains.txt
         sort -u *_domains.txt -o subdomains.txt
-        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
+        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_sub_domains.txt
         cat *.txt | sort -u > all_domains.txt
         if [ ! -z $exclude ];then
             echo -e $red"[+]"$end $bold"Excluding blacklisted domains"$end
@@ -56,13 +59,12 @@ get_subdomains() {
         else
             mv all_domains.txt domains.txt
         fi
-        find . -type f -name '_domains.txt' -delete
+        find . -type f -name '*_domains.txt' -delete
     fi
 }
 
 get_alive() {
     echo -e $red"[+]"$end $bold"Get Alive"$end
-
     cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
     cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
 }
@@ -99,7 +101,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
+    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -http-timeout 60000 -threads 1 2>/dev/null
 }
 
 get_js() {
@@ -133,21 +135,20 @@ get_endpoints() {
 }
 
 get_params() {
-    mkdir params
-    mkdir params/gospider
+    mkdir -p params/gospider
 
-    echo -e $red"[+]"$end $bold"Running Paramspider"$end
-    for targets in $(cat alive.txt); do
-        # Remove the protocol and sanitize the URL for a valid filename
-        targets_file=$(echo $targets | sed -E 's|https?://||; s|[/:]+|_|g')
-        
-        # Run ParamSpider with the sanitized domain
-        domain=$(echo $targets | sed -E 's|https?://||')
-        paramspider --domain "$domain" >/dev/null 2>&1
+    echo -e $red"[+]"$end $bold"Normalizing and deduplicating domains"$end
+    # Normalize and deduplicate domains
+    unique_domains=$(cat alive.txt | sed -E 's|https?://||' | sort -u)
+
+    for domain in $unique_domains; do
+        echo -e $green"[+]"$end $bold"Running Paramspider: $domain"$end
+        paramspider --domain "$domain" > /dev/null 2>&1
     done
     mv results params/paramspider
-    echo -e $red"[+]"$end $bold"Running Gospider"$end
-    gospider -S alive.txt -o params/gospider
+
+    echo -e $green"[+]"$end $bold"Running Gospider"$end
+    gospider -S alive.txt -o params/gospider > /dev/null 2>&1
 }
 
 get_paths() {
