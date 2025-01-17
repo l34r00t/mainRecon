@@ -179,7 +179,7 @@ get_zip() {
     echo -e $red"[+]"$end $bold"Get ZIP"$end
 
     cd ..
-    zip -r $folder.zip $folder
+    zip -rq $folder.zip $folder
 }
 
 get_message() {
