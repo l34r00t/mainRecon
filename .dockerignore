@@ -1,0 +1,11 @@
+.git
+.github
+*.md
+LICENSE
+img/
+.env
+.env.example
+start.sh
+stop.sh
+rebuild.sh
+data/
