@@ -12,16 +12,17 @@ echo -e $yellow"
  ._ _   _. o ._  |_)  _   _  _  ._  
  | | | (_| | | | | \ (/_ (_ (_) | |
 
-By_l34r00t | {v1.1}
 @leapintos | leandro@leandropintos.com
-
-Collaborator: @p0ch4t | joaquin.pochat@istea.com.ar
+-----------|--------------------------
+By_l34r00t | {v1.0}
+@p0ch4t    | 
+Sheryx00   | {v1.1}
 "$end
 
 # Usage
 Usage() {
     echo -e "$green
-Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt [-m/--mode] fast-scan/intensive-scan (optional: choose one)
+Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt [-e/--exclude] exclude.txt [OPTIONAL] -s [OPTIONAL]
 	"$end
     exit 1
 }
@@ -109,33 +110,39 @@ check_dependencies(){
 }
 
 get_subdomains() {
-    echo -e $red"[+]"$end $bold"Get Subdomains"$end
-    folder=$programa-$(date '-I')
-    mkdir -p /opt/BugBountyPrograms/$folder && cd /opt/BugBountyPrograms/$folder
 
-    findomain -q -f $file -r -u findomain_domains.txt
-    cat $file | assetfinder --subs-only >>assetfinder_domains.txt
-    amass enum -df $file -passive -o ammas_passive_domains.txt
-    subfinder -dL $file -o subfinder_domains.txt
-    sort -u *_domains.txt -o subdomains.txt
-    cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
-    cat *.txt | sort -u >domains.txt
-    find . -type f -not -name 'domains.txt' -delete
+    folder=$program-$(date '-I')
+    mkdir $folder && cd $folder
+
+    if [ ! -z $strict ];then
+        echo -e $red"[+]"$end $bold"Strict Mode"$end
+        cp /mainData/$file domains.txt
+    else
+        echo -e $red"[+]"$end $bold"Get Subdomains"$end
+        echo -e $green"[+]"$end $bold"Running findomain"$end
+        findomain -q -f /mainData/$file -r -u findomain_domains.txt
+        echo -e $green"[+]"$end $bold"Running amass"$end
+        amass enum -df /mainData/$file -active -o ammas_active_domains.txt
+        cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
+        echo -e $green"[+]"$end $bold"Running subfinder"$end
+        subfinder -dL /mainData/$file -o subfinder_domains.txt
+        sort -u *_domains.txt -o subdomains.txt
+        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_sub_domains.txt
+        cat *.txt | sort -u > all_domains.txt
+        if [ ! -z $exclude ];then
+            echo -e $red"[+]"$end $bold"Excluding blacklisted domains"$end
+            grep -v -f /mainData/$exclude all_domains.txt | tee domains.txt
+        else
+            mv all_domains.txt domains.txt
+        fi
+        find . -type f -name '*_domains.txt' -delete
+    fi
 }
 
 get_alive() {
     echo -e $red"[+]"$end $bold"Get Alive"$end
-
     cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
     cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
-
-    result="cat alive.txt"
-    message="[ + ] mainRecon Alert:
-    [ --> ] alive.txt for: $program 
-    $($result)"
-    curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
-
-    echo -e $green"[V] "$end"Dominios vivos obtenidos correctamente."
 }
 
 get_waybackurl() {
@@ -173,7 +180,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | aquatone --ports xlarge -out $current_path/aquatone/ -scan-timeout 500 -screenshot-timeout 50000 -http-timeout 6000
+    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -http-timeout 60000 -threads 1 2>/dev/null
 }
 
 get_js() {
@@ -208,15 +215,21 @@ get_endpoints() {
     echo -e $green"[V] "$end"Endpoints obtenidos correctamente."
 }
 
-get_paramspider() {
-    echo -e $red"[+]"$end $bold"Get ParamSpider"$end
+get_params() {
+    mkdir -p params/gospider
 
-    mkdir paramspider
+    echo -e $red"[+]"$end $bold"Normalizing and deduplicating domains"$end
+    # Normalize and deduplicate domains
+    unique_domains=$(cat alive.txt | sed -E 's|https?://||' | sort -u)
 
-    for targets in $(cat $file); do
-        targets_file=$(echo $targets | sed -E 's/[\.|\/|:]+/_/g')
-        python3 /opt/tools_mainRecon/ParamSpider/paramspider.py --domain $targets --exclude woff,css,js,png,svg,php,jpg --output paramspider/"$targets_file"_paramspider.txt
+    for domain in $unique_domains; do
+        echo -e $green"[+]"$end $bold"Running Paramspider: $domain"$end
+        paramspider --domain "$domain" > /dev/null 2>&1
     done
+    mv results params/paramspider
+
+    echo -e $green"[+]"$end $bold"Running Gospider"$end
+    gospider -S alive.txt -o params/gospider > /dev/null 2>&1
 }
 
 get_paths() {
@@ -226,7 +239,7 @@ get_paths() {
 
     for host in $(cat alive.txt); do
         dirsearch_file=$(echo $host | sed -E 's/[\.|\/|:]+/_/g').txt
-        python3 /opt/tools_mainRecon/dirsearch-0.4.0/dirsearch.py -E -t 50 --plain-text dirsearch/$dirsearch_file -u $host -w /opt/tools_mainRecon/dirsearch-0.4.0/db/dicc.txt | grep Target && tput sgr0
+        python3 /tools/dirsearch/dirsearch.py -t 50 -O plain -o dirsearch/$dirsearch_file -u $host -w /tools/dirsearch/db/dicc.txt 2>/dev/null | grep Target && echo -e "\033[0m"
     done
 
     grep -R '200' dirsearch/ > dirsearch/status200.txt 2>/dev/null
@@ -247,7 +260,7 @@ get_zip() {
     echo -e $red"[+]"$end $bold"Zipping.."$end
 
     cd ..
-    zip -r $folder.zip $folder
+    zip -rq $folder.zip $folder
 }
 
 get_message() {
@@ -275,7 +288,7 @@ list=(
     get_js
     get_tokens
     get_endpoints
-    get_paramspider
+    get_params
     get_paths
     get_zip
     get_message
@@ -291,6 +304,14 @@ while [ -n "$1" ]; do
         file=$(pwd)/$2
         shift
         ;;
+    -e | --exclude)
+    	exclude=$2
+	    shift
+    	;;
+    -s | -strict-scope)
+    	strict=true
+	    shift
+    	;;
     *)
         echo -e $red"[-]"$end "Unknown Option: $1"
         Usage
@@ -305,17 +326,15 @@ done
 }
 
 (
-    check_root
-    check_dependencies
-    get_subdomains
-    get_alive
-    get_waybackurl
-    get_aquatone
-    get_js
-    get_tokens
-    get_endpoints
-    get_paramspider
-    get_paths
-    get_zip
-    get_message
+   get_subdomains
+   get_alive
+   get_waybackurl
+   get_aquatone
+   get_js
+   get_tokens
+   get_endpoints
+   get_params
+   get_paths
+   get_zip
+   get_message
 )

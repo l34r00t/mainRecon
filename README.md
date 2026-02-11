@@ -96,6 +96,7 @@ You can run the docker image in your PC o [VPS](https://www.digitalocean.com/?re
 | new-zile          |  https://github.com/bonino97/new-zile                 |    
 | LinkFinder        |  https://github.com/GerbenJavado/LinkFinder           |
 | paramspider       |  https://github.com/devanshbatham/ParamSpider         |
+| gospider          |  https://github.com/jaeles-project/gospider         |
 | dirsearch         |  https://github.com/maurosoria/dirsearch              |
 | TelegramBot       |  https://core.telegram.org/bots                       |
 
@@ -131,11 +132,11 @@ After building the container using either way, run the following:
 
 **linux/amd64:**
 
-```docker run --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+```docker run --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> [-f/--file] targets.txt [-e/--exclude] excludes.txt [OPTIONAL] -s [OPTIONAL]```
 
 **Others (including Apple silicon):**
 
-```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData mainrecon -p [--program] <hackerone> [-f/--file] targets.txt [-e/--exclude] excludes.txt [OPTIONAL] -s [OPTIONAL]```
 
 ### Option 2 - Use the image from docker hub
 
@@ -147,7 +148,7 @@ Use image from docker hub: [l34r00t/mainrecon](https://hub.docker.com/u/l34r00t/
     --env findomain_spyse_token="spyse_token" \
     --env findomain_virustotal="virustotal_token" \
     --env findomain_securitytrails_token="securitytrails_token" \
-    -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt
+    -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> [-f/--file] targets.txt [-e/--exclude] excludes.txt [OPTIONAL] -s [OPTIONAL]
 
 ### Considerations to run the container
 
@@ -157,11 +158,11 @@ There are differents use cases for use the image and you should know how to run 
 
 **linux/amd64:**
 
-```docker run --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+```docker run --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> [-f/--file] targets.txt [-e/--exclude] excludes.txt [OPTIONAL] -s [OPTIONAL]```
 
 **Others (including Apple silicon):**
 
-```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> -f [--file] targets.txt```
+```docker run --platform linux/amd64 --rm -it -v /path/to/local/directory:/mainData --name mainrecon l34r00t/mainrecon -p [--program] <hackerone> [-f/--file] targets.txt [-e/--exclude] excludes.txt [OPTIONAL] -s [OPTIONAL]```
 
 
 ### targets.txt
@@ -171,6 +172,17 @@ Your targets.txt should include a list of domains you're checking and should loo
         hackerone.com
         hackerone-ext-content.com
         hackerone-user-content.com
+
+### excludes.txt
+
+You can add any "out of scope" target to this file. You **don't must** use wildcard here, instead start the line with a . (dot) for subdomains. It should look something like:
+
+        dev.hackerone.com # exclude dev.hackerone.com and subdomains
+        .dev.hackerone.com # allow dev.hackerone.com but exclude it subdomains
+
+### Strict mode
+
+If you don't want to collect or scan subdomains, add the `-s` flag at the end of the command. It will skip the _get_subdomains_ functionalities, scanning only the explicit domains in targets.txt
 
 ### Create telegram webhook        
 
