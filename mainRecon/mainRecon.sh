@@ -21,7 +21,7 @@ Collaborator: @p0ch4t | joaquin.pochat@istea.com.ar
 # Usage
 Usage() {
     echo -e "$green
-Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt
+Usage: ./mainRecon.sh [-p/--program] hackerone [-f/--file] targets.txt [-m/--mode] fast-scan/intensive-scan (optional: choose one)
 	"$end
     exit 1
 }
@@ -261,8 +261,9 @@ get_message() {
     echo -e $green"[+] "$end"Escaneo completado con exito. Datos almacenados en: /opt/BugBountyPrograms/$folder"
 }
 
-program=False
+programa=False
 file=False
+mode=False
 
 list=(
     check_root
@@ -298,7 +299,7 @@ while [ -n "$1" ]; do
     shift
 done
 
-[[ $program == "False" ]] && [[ $file == "False" ]] && {
+[[ $programa == "False" ]] && [[ $file == "False" ]] && {
     echo -e $red"[-]"$end "Argument: -p/--program & -f/--file is Required"
     Usage
 }
