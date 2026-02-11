@@ -15,8 +15,8 @@ echo -e $yellow"
 @leapintos | leandro@leandropintos.com
 -----------|--------------------------
 By_l34r00t | {v1.0}
+@p0ch4t    | 
 Sheryx00   | {v1.1}
-
 "$end
 
 # Usage
@@ -32,7 +32,83 @@ bot_token=$token
 chat_ID=$chat_ID
 url="https://api.telegram.org/bot$bot_token/sendMessage"
 
-# Function
+# Functions
+
+check_root(){
+	if [ "$(id -u)" != "0" ]; then
+		echo -e $red"[X] Este programa solo puede ejecutarse siendo ROOT!"$end
+		exit 1
+	fi
+}
+
+check_dependencies(){
+	echo -e $green"[+] "$end"Chequeando dependencias...\n"
+	mkdir -p /opt/tools_mainRecon > /dev/null 2>&1
+	export PATH="$PATH:/opt/tools_mainRecon"
+	dependencies=(findomain assetfinder amass subfinder httprobe waybackurls aquatone zile.py linkfinder.py paramspider.py subjs dirsearch.py unfurl)
+	for program in "${dependencies[@]}"; do
+		which $program > /dev/null 2>&1
+		if [ "$(echo $?)" -ne "0" ]; then
+			echo -e $red"[X] $program "$end"no esta instalado."
+			case $program in
+				findomain) 
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/Findomain/Findomain/releases/download/5.1.1/findomain-linux -O /opt/tools_mainRecon/findomain && chmod +x /opt/tools_mainRecon/findomain && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				assetfinder) 
+					echo -e "${yellow}[..]${end} Instalando $program"
+					apt install $program -y > /dev/null 2>&1 && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				amass) 
+					echo -e "${yellow}[..]${end} Instalando $program"
+					apt install $program -y > /dev/null 2>&1 && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				subfinder) 
+					echo -e "${yellow}[..]${end} Instalando $program"
+					apt install $program -y > /dev/null 2>&1 && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				httprobe) 
+					echo -e "${yellow}[..]${end} Instalando $program"
+					apt install $program -y > /dev/null 2>&1 && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				waybackurls)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/tomnomnom/waybackurls/releases/download/v0.1.0/waybackurls-linux-amd64-0.1.0.tgz -O /opt/tools_mainRecon/waybackurls.tgz && tar -xzf /opt/tools_mainRecon/waybackurls.tgz -C /opt/tools_mainRecon/ && rm /opt/tools_mainRecon/waybackurls.tgz && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				aquatone)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip -O /opt/tools_mainRecon/aquatone.zip && unzip -q /opt/tools_mainRecon/aquatone.zip -d /opt/tools_mainRecon && rm /opt/tools_mainRecon/aquatone.zip /opt/tools_mainRecon/README.md /opt/tools_mainRecon/LICENSE.txt && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				zile.py)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget https://raw.githubusercontent.com/bonino97/new-zile/master/zile.py -q --show-progress -O /opt/tools_mainRecon/zile.py && chmod +x /opt/tools_mainRecon/zile.py && sed -i '1s/^/#!\/usr\/bin\/python3\n/' /opt/tools_mainRecon/zile.py && pip3 install termcolor -q && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				linkfinder.py)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					cd /opt/tools_mainRecon; git clone https://github.com/GerbenJavado/LinkFinder.git -q && pip3 install -r LinkFinder/requirements.txt -q && ln -s /opt/tools_mainRecon/LinkFinder/linkfinder.py /opt/tools_mainRecon/linkfinder.py && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				paramspider.py)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					cd /opt/tools_mainRecon; git clone https://github.com/devanshbatham/ParamSpider -q && pip3 install -r ParamSpider/requirements.txt -q && ln -s /opt/tools_mainRecon/ParamSpider/paramspider.py /opt/tools_mainRecon/paramspider.py && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				subjs)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/lc/subjs/releases/download/v1.0.1/subjs_1.0.1_linux_amd64.tar.gz -O /opt/tools_mainRecon/subjs.tar.gz && tar -xzf /opt/tools_mainRecon/subjs.tar.gz -C /opt/tools_mainRecon/ && rm /opt/tools_mainRecon/subjs.tar.gz /opt/tools_mainRecon/LICENSE /opt/tools_mainRecon/README.md && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				dirsearch.py)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/maurosoria/dirsearch/archive/refs/tags/v0.4.0.zip -O /opt/tools_mainRecon/dirsearch.zip && unzip -q /opt/tools_mainRecon/dirsearch.zip -d /opt/tools_mainRecon/ && rm /opt/tools_mainRecon/dirsearch.zip && ln -s /opt/tools_mainRecon/dirsearch-0.4.0/dirsearch.py /opt/tools_mainRecon/dirsearch.py && echo -e "${green}[V] $program${end} instalado correctamente!"
+					;;
+				unfurl)
+					echo -e "${yellow}[..]${end} Instalando $program"
+					wget -q --show-progress https://github.com/tomnomnom/unfurl/releases/download/v0.4.0/unfurl-linux-amd64-0.4.0.tgz -O /opt/tools_mainRecon/unfurl-linux-amd64-0.4.0.tgz && tar -xzf /opt/tools_mainRecon/unfurl-linux-amd64-0.4.0.tgz -C /opt/tools_mainRecon/ && rm /opt/tools_mainRecon/unfurl-linux-amd64-0.4.0.tgz && echo -e "${green}[V] $program${end} instalado correctamente!"
+			esac
+		else
+			echo -e $green"[V] $program"$end
+		fi
+	done
+}
+
 get_subdomains() {
 
     folder=$program-$(date '-I')
@@ -74,7 +150,7 @@ get_waybackurl() {
 
     mkdir waybackdata
 
-    cat alive.txt | waybackurls >waybackdata/waybackurls.txt
+    cat alive.txt | waybackurls > waybackdata/waybackurls.txt
     cat waybackdata/waybackurls.txt | sort -u | unfurl --unique keys >waybackdata/paramlist.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.js(\?|$)" | sort -u >waybackdata/jsurls.txt
     cat waybackdata/waybackurls.txt | sort -u | grep -P "\w+\.php(\?|$)" | sort -u >waybackdata/phpurls.txt
@@ -96,6 +172,9 @@ get_waybackurl() {
     cat waybackdata/waybackurls.txt | sort -u | grep result= >waybackdata/open_result.txt
 
     find waybackdata/ -size 0 -delete
+
+    echo -e $green"[V] "$end"Waybackurl machine consultada correctamente."
+
 }
 
 get_aquatone() {
@@ -109,7 +188,7 @@ get_js() {
 
     mkdir jslinks
 
-    cat alive.txt | subjs >>jslinks/all_jslinks.txt
+    cat alive.txt | subjs >>jslinks/all_jslinks.txt && echo -e $green"[V] "$end"Archivos JS obtenidos correctamente."
 }
 
 get_tokens() {
@@ -119,7 +198,7 @@ get_tokens() {
 
     cat alive.txt waybackdata/jsurls.txt jslinks/all_jslinks.txt >tokens/all_js_urls.txt
     sort -u tokens/all_js_urls.txt -o tokens/all_js_urls.txt
-    cat tokens/all_js_urls.txt | python3 /tools/new-zile/zile.py --request >>tokens/all_tokens.txt
+    cat tokens/all_js_urls.txt | zile.py --request >>tokens/all_tokens.txt && echo -e $green"[V] "$end"Tokens obtenidos correctamente."
     sort -u tokens/all_tokens.txt -o tokens/all_tokens.txt
 }
 
@@ -130,8 +209,10 @@ get_endpoints() {
 
     for link in $(cat jslinks/all_jslinks.txt); do
         links_file=$(echo $link | sed -E 's/[\.|\/|:]+/_/g').txt
-        python3 /tools/LinkFinder/linkfinder.py -i $link -o cli >>endpoints/$links_file
+        python3 /opt/tools_mainRecon/LinkFinder/linkfinder.py -i $link -o cli >>endpoints/$links_file
     done
+
+    echo -e $green"[V] "$end"Endpoints obtenidos correctamente."
 }
 
 get_params() {
@@ -176,25 +257,30 @@ get_paths() {
 }
 
 get_zip() {
-    echo -e $red"[+]"$end $bold"Get ZIP"$end
+    echo -e $red"[+]"$end $bold"Zipping.."$end
 
     cd ..
     zip -rq $folder.zip $folder
 }
 
 get_message() {
-    echo -e $red"[+]"$end $bold"Get Message"$end
+    echo -e $red"[+]"$end $bold"Sending Message.."$end
 
     message="[ + ] mainRecon Alert:
     [ --> ] Recon Completed for $program #happyhacking"
 
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
+
+    echo -e $green"[+] "$end"Escaneo completado con exito. Datos almacenados en: /opt/BugBountyPrograms/$folder"
 }
 
-program=False
+programa=False
 file=False
+mode=False
 
 list=(
+    check_root
+    check_dependencies
     get_subdomains
     get_alive
     get_waybackurl
@@ -211,11 +297,11 @@ list=(
 while [ -n "$1" ]; do
     case "$1" in
     -p | --program)
-        program=$2
+        programa=$2
         shift
         ;;
     -f | --file)
-        file=$2
+        file=$(pwd)/$2
         shift
         ;;
     -e | --exclude)
@@ -234,10 +320,11 @@ while [ -n "$1" ]; do
     shift
 done
 
-[[ $program == "False" ]] && [[ $file == "False" ]] && {
+[[ $programa == "False" ]] && [[ $file == "False" ]] && {
     echo -e $red"[-]"$end "Argument: -p/--program & -f/--file is Required"
     Usage
 }
+
 (
    get_subdomains
    get_alive
