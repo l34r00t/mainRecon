@@ -12,8 +12,10 @@ echo -e $yellow"
  ._ _   _. o ._  |_)  _   _  _  ._  
  | | | (_| | | | | \ (/_ (_ (_) | |
 
-By_l34r00t | {v1.0}
+By_l34r00t | {v1.1}
 @leapintos | leandro@leandropintos.com
+
+Collaborator: @p0ch4t | joaquin.pochat@istea.com.ar
 "$end
 
 # Usage
@@ -256,9 +258,7 @@ get_message() {
 
     curl --silent --output /dev/null -F chat_id="$chat_ID" -F "text=$message" $url -X POST
 
-    echo -e $green"\n[+] "$end"Escaneo completado con exito. Datos almacenados en: /opt/BugBountyPrograms/$folder\n"
-
-    exit 0
+    echo -e $green"[+] "$end"Escaneo completado con exito. Datos almacenados en: /opt/BugBountyPrograms/$folder"
 }
 
 programa=False
@@ -266,8 +266,8 @@ file=False
 mode=False
 
 list=(
-	check_root
-	check_dependencies
+    check_root
+    check_dependencies
     get_subdomains
     get_alive
     get_waybackurl
@@ -291,10 +291,6 @@ while [ -n "$1" ]; do
         file=$(pwd)/$2
         shift
         ;;
-    -m | --mode)
-        mode=$2
-        shift
-        ;;
     *)
         echo -e $red"[-]"$end "Unknown Option: $1"
         Usage
@@ -308,50 +304,18 @@ done
     Usage
 }
 
-if [ "$mode" == "fast-scan" ]; then
-    (
-	    check_root
-	    check_dependencies
-   	    get_subdomains
-        get_alive
-        get_aquatone
-        get_paramspider
-        get_zip
-        get_message
-    )
-elif [ "$mode" == "intensive-scan" ]; then
-     (
-         check_root
-         check_dependencies
-         get_subdomains
-         get_alive
-         get_waybackurl
-         get_aquatone
-         get_js
-         get_tokens
-         get_endpoints
-         get_paramspider
-         get_paths
-         get_zip
-         get_message
-     )
-elif [ "$mode" == "False" ]; then
-      (
-          check_root
-          check_dependencies
-          get_subdomains
-          get_alive
-          get_waybackurl
-          get_aquatone
-          get_js
-          get_tokens
-          get_endpoints
-          get_paramspider
-          get_paths
-          get_zip
-          get_message
-      )
-else
-    echo -e $red"[X] "$end"Please, choose one mode! 'fast-scan' or 'intensive-scan'\n"
-    exit 1
-fi
+(
+    check_root
+    check_dependencies
+    get_subdomains
+    get_alive
+    get_waybackurl
+    get_aquatone
+    get_js
+    get_tokens
+    get_endpoints
+    get_paramspider
+    get_paths
+    get_zip
+    get_message
+)
